@@ -5,7 +5,6 @@ import java.util.List;
 import javax.microedition.khronos.opengles.GL10;
 
 import yoan.game.framework.modules.game.Game;
-import yoan.game.framework.modules.game.gl.GLGame;
 import yoan.game.framework.modules.graphics.gl.Camera2D;
 import yoan.game.framework.modules.graphics.gl.SpriteBatcher;
 import yoan.game.framework.modules.input.Input.TouchEvent;
@@ -97,7 +96,7 @@ public class MainMenuScreen extends GLScreen {
 				if(OverlapTester.pointInRectangle(multiplayerBounds, touchPoint)){
 					Assets.playSound(Assets.clickSound);
 					//transition vers l'écran des highscores
-					game.setScreen(new ConnexionScreen((GLGame) game));
+					game.setScreen(new ConnexionScreen(game));
 					return;
 				}
 				//sur le bouton "Aide"

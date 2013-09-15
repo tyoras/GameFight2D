@@ -4,7 +4,7 @@ import java.util.List;
 
 import javax.microedition.khronos.opengles.GL10;
 
-import yoan.game.framework.modules.game.gl.GLGame;
+import yoan.game.framework.modules.game.Game;
 import yoan.game.framework.modules.graphics.gl.Camera2D;
 import yoan.game.framework.modules.graphics.gl.SpriteBatcher;
 import yoan.game.framework.modules.input.Input.TouchEvent;
@@ -40,14 +40,14 @@ public class ConnexionScreen extends GLScreen {
 	 * Constructeur hérité de GLScreen
 	 * @param game : instance du jeu
 	 */
-	public ConnexionScreen(GLGame game){
+	public ConnexionScreen(Game game){
 		super(game);
 		guiCam= new Camera2D(glGraphics, SCREEN_WIDTH, SCREEN_HEIGHT);
 		backBounds= new Rectangle(0, 0, BUTTON_SIZE, BUTTON_SIZE);
 		tiltBounds= new Rectangle(SCREEN_WIDTH/2, SCREEN_HEIGHT/2, BUTTON_SIZE, BUTTON_SIZE);
 		touchPoint= new Vector2();
 		batcher= new SpriteBatcher(glGraphics, 100);
-		game.activateBlueTooth();
+		glGame.activateBlueTooth();
 		text = "-1";
 		lastMsg = null;
 	}

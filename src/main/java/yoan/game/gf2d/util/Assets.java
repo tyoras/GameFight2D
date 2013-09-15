@@ -137,6 +137,7 @@ public class Assets {
      * Recharge les éléments du jeu
      */
     public static void reload() {
+    	connectScreen.reload();
         background.reload();
         items.reload();
         if(Settings.soundEnabled)
