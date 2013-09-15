@@ -31,6 +31,11 @@ public class ConnexionScreen extends GLScreen {
 	/** Nom du device connecté */
 	String connectedDeviceName;
 	
+	String text;
+	String lastMsg;
+	Rectangle tiltBounds;
+	int nbTilt =0;
+	
 	/**
 	 * Constructeur hérité de GLScreen
 	 * @param game : instance du jeu
@@ -39,9 +44,12 @@ public class ConnexionScreen extends GLScreen {
 		super(game);
 		guiCam= new Camera2D(glGraphics, SCREEN_WIDTH, SCREEN_HEIGHT);
 		backBounds= new Rectangle(0, 0, BUTTON_SIZE, BUTTON_SIZE);
+		tiltBounds= new Rectangle(SCREEN_WIDTH/2, SCREEN_HEIGHT/2, BUTTON_SIZE, BUTTON_SIZE);
 		touchPoint= new Vector2();
 		batcher= new SpriteBatcher(glGraphics, 100);
 		game.activateBlueTooth();
+		text = "-1";
+		lastMsg = null;
 	}
 
 	@Override
@@ -66,12 +74,28 @@ public class ConnexionScreen extends GLScreen {
 					game.setScreen(new MainMenuScreen(game));
 					return;
 				}
+				//sur le bouton Tilt
+				if(OverlapTester.pointInRectangle(tiltBounds, touchPoint)){
+					nbTilt++;
+					String msg = "tilt ="+ nbTilt; 
+					game.getBlueTooth().write(msg);
+					return;
+				}
 			}
 		}
 		
+		manageBlueToothEvents();
 		//mise à jour du nom du device connecté
-		String deviceName = game.getBlueTooth().getConnectedDeviceName();
-		connectedDeviceName = deviceName != null ? deviceName : "not connected";
+//		String deviceName = game.getBlueTooth().getConnectedDeviceName();
+//		connectedDeviceName = deviceName != null ? deviceName : "not connected";
+	}
+	
+	private void manageBlueToothEvents() {
+		lastMsg = game.getBlueTooth().getLastMsg();
+		if (lastMsg != null && !lastMsg.equals("") && !lastMsg.equals(text)) {
+    		text = lastMsg;
+    		Assets.playSound(Assets.clickSound);
+		}
 	}
 
 	@Override
@@ -91,10 +115,9 @@ public class ConnexionScreen extends GLScreen {
 		 
 		//dessin du texte
 		batcher.beginBatch(Assets.items);
-		//TODO [1280x800] constantes à modifier
-		batcher.drawSprite(SCREEN_WIDTH/2, 260, 300, 33, Assets.highScoresRegion);
-		 
 		batcher.drawSprite(BASIC_ELEMENT_SIZE, BASIC_ELEMENT_SIZE, BUTTON_SIZE, BUTTON_SIZE, Assets.arrow);
+		batcher.drawSprite(BASIC_ELEMENT_SIZE + SCREEN_WIDTH/2, BASIC_ELEMENT_SIZE + SCREEN_HEIGHT/2, BUTTON_SIZE, BUTTON_SIZE, Assets.help);
+		Assets.font.drawText(batcher, text, BASIC_ELEMENT_SIZE/2, SCREEN_HEIGHT - 20);
 		batcher.endBatch();
 		 
 		gl.glDisable(GL10.GL_BLEND);
