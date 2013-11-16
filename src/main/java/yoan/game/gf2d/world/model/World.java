@@ -41,6 +41,10 @@ public class World {
 	
 	/** Instance du personnage */
 	public final Champion champ;
+	
+	/** Instance du personnage */
+	public final Champion enemy;
+	
 	/** Liste des plateformes */
 	public final List<Platform> platforms;
     /** listener d'évenement du monde */
@@ -60,6 +64,7 @@ public class World {
      */
     public World(WorldListener listener) {
     	champ = new FakeChampion1(WORLD_WIDTH/2, 1);
+    	enemy = new FakeChampion1(WORLD_WIDTH/3, 1);
     	platforms = new ArrayList<Platform>();
     	this.listener = listener;
     	rand = new Random();
@@ -98,6 +103,7 @@ public class World {
      */
 	public void update(float deltaTime, float accelX) {
 		updateChampion(deltaTime, accelX);
+		updateEnemy(deltaTime, accelX);
 		updatePlatforms(deltaTime);
 		if(champ.state != Champion.State.HIT) checkCollisions();
 		checkGameOver();
@@ -118,6 +124,22 @@ public class World {
 	        champ.velocity.x = accelX / 10 * champ.MOVE_VELOCITY;
 	    champ.update(deltaTime);
 	    //heightSoFar = Math.max(champ.position.y, heightSoFar);
+	}
+	
+	/**
+	 * Mise à jour de l'adversaire
+	 * @param deltaTime : temps écoulé
+	 * @param accelX : accéleration sur l'axe X
+	 */
+	private void updateEnemy(float deltaTime, float accelX) {
+		//rebond sur le sol autorisé
+	    if (enemy.state != Champion.State.HIT && enemy.position.y <= 0.5f)
+	    	enemy.hitPlatform();
+	    //modification de la vitesse horizontale en fonction de l'inclinaison du téléphone
+	    if (enemy.state != Champion.State.HIT)
+	    	// /10 pour la normalisation [-10;10] => [-1;1]
+	    	enemy.velocity.x = accelX / 100 * champ.MOVE_VELOCITY;
+	    enemy.update(deltaTime);
 	}
 
 	/**
@@ -178,6 +200,17 @@ public class World {
 	 * Détection des colisions avec les autres éléments
 	 */
 	private void checkItemCollisions(){
+		//si personnage au dessus de la plateforme
+		if(champ.position.y > enemy.position.y){
+			//si chevauchement
+			if(OverlapTester.overlapRectangles(champ.bounds, enemy.bounds)){
+				//on indique au personnage qu'il l'a touché
+				champ.hitPlatform();
+				//et on envoi un évenement saut au consommateur
+				listener.jump();
+				enemy.hit();
+			}
+		}
 	}
 
 	/**

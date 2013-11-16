@@ -74,6 +74,7 @@ public class WorldRenderer {
 		//un seul batch pour tous les éléments
 		batcher.beginBatch(Assets.items);
 		renderChampion();
+		renderEnemy();
 		renderPlatforms();
 		renderItems();
 		batcher.endBatch();
@@ -101,6 +102,29 @@ public class WorldRenderer {
 		//on détermine de quel côté il est tourné
 		float side= world.champ.velocity.x < 0 ? -1 : 1;
 		batcher.drawSprite(world.champ.position.x, world.champ.position.y, side * 1, 1, keyFrame);
+	}
+	
+	/**
+	 * Effectue le rendu de l'adversaire en fonction de son état
+	 */
+	private void renderEnemy(){
+		TextureRegion keyFrame;
+		switch(world.enemy.state){
+			case FALL:
+				//recupération de la frame de chute
+				keyFrame= Assets.fakeChamp1Fall.getKeyFrame(world.enemy.stateTime, Animation.ANIMATION_LOOPING);
+				break;
+			case JUMP:
+				//récupération de la frame de saut
+				keyFrame= Assets.fakeChamp1Jump.getKeyFrame(world.enemy.stateTime, Animation.ANIMATION_LOOPING);
+				break;
+			case HIT:
+			default:
+				keyFrame= Assets.fakeChamp1Hit;
+		}
+		//on détermine de quel côté il est tourné
+		float side= world.enemy.velocity.x < 0 ? -1 : 1;
+		batcher.drawSprite(world.enemy.position.x, world.enemy.position.y, side * 1, 1, keyFrame);
 	}
 	
 	/**
