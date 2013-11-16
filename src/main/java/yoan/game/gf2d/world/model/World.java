@@ -117,7 +117,7 @@ public class World {
 	    	// /10 pour la normalisation [-10;10] => [-1;1]
 	        champ.velocity.x = accelX / 10 * champ.MOVE_VELOCITY;
 	    champ.update(deltaTime);
-	    heightSoFar = Math.max(champ.position.y, heightSoFar);
+	    //heightSoFar = Math.max(champ.position.y, heightSoFar);
 	}
 
 	/**

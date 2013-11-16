@@ -48,7 +48,7 @@ public class WorldRenderer {
 	 */
 	public void render(){
 		//la caméra se positionne à la plus grande hauteur atteinte
-		if(world.champ.position.y > cam.position.y) cam.position.y= world.champ.position.y;
+		//if(world.champ.position.y > cam.position.y) cam.position.y= world.champ.position.y;
 		cam.setViewportAndMatrices();
 		renderBackground();
 		renderObjects();
