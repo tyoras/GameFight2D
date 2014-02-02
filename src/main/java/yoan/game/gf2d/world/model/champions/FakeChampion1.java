@@ -1,4 +1,5 @@
-package yoan.game.gf2d.world.model;
+package yoan.game.gf2d.world.model.champions;
+
 
 /**
  * Implémentation temporaire d'un champion

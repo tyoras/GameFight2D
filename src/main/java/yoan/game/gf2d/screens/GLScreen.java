@@ -31,6 +31,11 @@ public abstract class GLScreen extends Screen {
 	/** Hauteur du logo */
 	public static final int LOGO_HEIGHT = 142;
 	
+	/** Hauteur d'un sprite du robot */
+	public static final int ROBOT_SPRITE_HEIGHT = 128;
+	/** Largeur d'un sprite du robot */
+	public static final int ROBOT_SPRITE_WIDTH = 64;
+	
 	
 	/** Accès à la gestion des graphismes */
 	protected final GLGraphics glGraphics;

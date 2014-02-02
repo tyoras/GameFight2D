@@ -1,6 +1,7 @@
-package yoan.game.gf2d.world.model;
+package yoan.game.gf2d.world.model.champions;
 
 import yoan.game.framework.modules.game.model.DynamicGameObject;
+import yoan.game.gf2d.world.model.World;
 
 /**
  * 
@@ -19,7 +20,11 @@ public abstract class Champion extends DynamicGameObject {
 		/** En train de tomber */
 		FALL,
 		/** Touché par un objet */
-		HIT
+		HIT, 
+		/** Debout sans bouger */
+		STAND,
+		/** En train de marcher */
+		WALK
 	}
 	
 	/** Etat courant du personnage */

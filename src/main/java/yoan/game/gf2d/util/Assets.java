@@ -7,6 +7,8 @@ import static yoan.game.gf2d.screens.GLScreen.GLYPH_WIDTH;
 import static yoan.game.gf2d.screens.GLScreen.LOGO_HEIGHT;
 import static yoan.game.gf2d.screens.GLScreen.PLATFORM_HEIGHT;
 import static yoan.game.gf2d.screens.GLScreen.PLATFORM_WIDTH;
+import static yoan.game.gf2d.screens.GLScreen.ROBOT_SPRITE_HEIGHT;
+import static yoan.game.gf2d.screens.GLScreen.ROBOT_SPRITE_WIDTH;
 import static yoan.game.gf2d.screens.GLScreen.SCREEN_HEIGHT;
 import static yoan.game.gf2d.screens.GLScreen.SCREEN_WIDTH;
 import yoan.game.framework.modules.audio.Music;
@@ -27,6 +29,14 @@ public class Assets {
 	/** Fond du jeu */
 	public static Texture background;
 	public static TextureRegion backgroundRegion;
+	
+	/** Champion Robot */
+	public static Texture robot;
+	public static Animation robotStand;
+	public static Animation robotWalk;
+    public static TextureRegion robotHit;
+	
+	
 	/** Fond de l'acran de connexion */
 	public static Texture connectScreen;
 	public static TextureRegion connectScreenRegion;
@@ -84,8 +94,24 @@ public class Assets {
      * @param game : instance du jeu
      */
     public static void load(GLGame game) {
-        background = new Texture(game, "pixmaps/background.png");
+        background = new Texture(game, "pixmaps/background.jpg");
         backgroundRegion = new TextureRegion(background, 0, 0, SCREEN_WIDTH, SCREEN_HEIGHT);
+        
+        robot = new Texture(game, "pixmaps/champions/robot.png");
+        robotStand = new Animation(0.4f,
+                            new TextureRegion(robot, 0, 0, ROBOT_SPRITE_WIDTH, ROBOT_SPRITE_HEIGHT),
+                            new TextureRegion(robot, ROBOT_SPRITE_WIDTH, 0, ROBOT_SPRITE_WIDTH, ROBOT_SPRITE_HEIGHT),
+                            new TextureRegion(robot, 2*ROBOT_SPRITE_WIDTH, 0, ROBOT_SPRITE_WIDTH, ROBOT_SPRITE_HEIGHT));
+        robotHit = new TextureRegion(robot, 3*ROBOT_SPRITE_WIDTH, 0, ROBOT_SPRITE_WIDTH, ROBOT_SPRITE_HEIGHT);
+        robotWalk = new Animation(0.2f,
+                            new TextureRegion(robot, 0, ROBOT_SPRITE_HEIGHT, ROBOT_SPRITE_WIDTH, ROBOT_SPRITE_HEIGHT),
+                            new TextureRegion(robot, ROBOT_SPRITE_WIDTH, ROBOT_SPRITE_HEIGHT, ROBOT_SPRITE_WIDTH, ROBOT_SPRITE_HEIGHT),
+                            new TextureRegion(robot, 2*ROBOT_SPRITE_WIDTH, ROBOT_SPRITE_HEIGHT, ROBOT_SPRITE_WIDTH, ROBOT_SPRITE_HEIGHT),
+                            new TextureRegion(robot, 3*ROBOT_SPRITE_WIDTH, ROBOT_SPRITE_HEIGHT, ROBOT_SPRITE_WIDTH, ROBOT_SPRITE_HEIGHT),
+                            new TextureRegion(robot, 4*ROBOT_SPRITE_WIDTH, ROBOT_SPRITE_HEIGHT, ROBOT_SPRITE_WIDTH, ROBOT_SPRITE_HEIGHT),
+                            new TextureRegion(robot, 5*ROBOT_SPRITE_WIDTH, ROBOT_SPRITE_HEIGHT, ROBOT_SPRITE_WIDTH, ROBOT_SPRITE_HEIGHT),
+                            new TextureRegion(robot, 6*ROBOT_SPRITE_WIDTH, ROBOT_SPRITE_HEIGHT, ROBOT_SPRITE_WIDTH, ROBOT_SPRITE_HEIGHT));
+        
         
         connectScreen = new Texture(game, "pixmaps/connecting.png");
         connectScreenRegion = new TextureRegion(connectScreen, 0, 0, SCREEN_WIDTH, SCREEN_HEIGHT);
@@ -140,6 +166,7 @@ public class Assets {
     	connectScreen.reload();
         background.reload();
         items.reload();
+        robot.reload();
         if(Settings.soundEnabled)
             music.play();
     }

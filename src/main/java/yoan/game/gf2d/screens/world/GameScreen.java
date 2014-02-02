@@ -60,10 +60,6 @@ public class GameScreen extends GLScreen {
 	Rectangle quitBounds;
 	/** Limites du bouton son */
 	Rectangle soundBounds;
-	/** Dernière valeur connue du score */
-	int lastScore;
-	/** Score à afficher */
-	String scoreString;
 	
 	/**
 	 * Constructeur hérité de GLScreen
@@ -89,13 +85,11 @@ public class GameScreen extends GLScreen {
         };
         world = new World(worldListener);
         renderer = new WorldRenderer(glGraphics, batcher, world);
-        pauseBounds = new Rectangle(SCREEN_WIDTH- BUTTON_SIZE, SCREEN_HEIGHT- BUTTON_SIZE, BUTTON_SIZE, BUTTON_SIZE);
+        pauseBounds = new Rectangle(0, SCREEN_HEIGHT- BUTTON_SIZE, BUTTON_SIZE, BUTTON_SIZE);
         soundBounds = new Rectangle(0, 0, BUTTON_SIZE, BUTTON_SIZE);
         //TODO [1280x800] constantes à modifier
         resumeBounds = new Rectangle(SCREEN_WIDTH/2 - 3*BASIC_ELEMENT_SIZE, SCREEN_HEIGHT/2, 6*BASIC_ELEMENT_SIZE, 36);
         quitBounds = new Rectangle(SCREEN_WIDTH/2 - 3*BASIC_ELEMENT_SIZE, SCREEN_HEIGHT/2 - 36, 6*BASIC_ELEMENT_SIZE, 36);
-        lastScore = 0;
-        scoreString = "score: 0";
     }
 
 	/**
@@ -164,25 +158,12 @@ public class GameScreen extends GLScreen {
 		//mise à jour du mond en fonction de l'accéleromètre
 		world.update(deltaTime, game.getInput().getAccelY());
 		
-		//si évolution du score
-		if(world.score != lastScore){
-			lastScore= world.score;
-			scoreString= "" + lastScore;
-		}
 		//si niveau terminé
 		if(world.state == World.State.NEXT_LEVEL){
 			state= State.LEVEL_END;
 		//si partie perdue
 		} else if(world.state == World.State.GAME_OVER){
 			state= State.GAME_OVER;
-			if(lastScore > Settings.highscores[4]) {
-				scoreString= "new highscore: " + lastScore;
-				//enregistrement du score
-				Settings.addScore(lastScore);
-				Settings.save(game.getFileIO());
-			} else {
-				scoreString= "score: " + lastScore;
-			}
 		}
 	}
 	
@@ -239,7 +220,6 @@ public class GameScreen extends GLScreen {
 			world= new World(worldListener);
 			//réinitialisation du rendu
 			renderer= new WorldRenderer(glGraphics, batcher, world);
-			world.score= lastScore;
 			state= State.READY;
 		}
 	}
@@ -313,10 +293,7 @@ public class GameScreen extends GLScreen {
 	 */
 	private void presentRunning(){
 		//dessin du bouton pause
-		batcher.drawSprite(SCREEN_WIDTH - BASIC_ELEMENT_SIZE, SCREEN_HEIGHT - BASIC_ELEMENT_SIZE, BUTTON_SIZE, BUTTON_SIZE, Assets.pause);
-		//affichage du score actuel
-		//TODO [1280x800] constantes à modifier
-		Assets.font.drawText(batcher, scoreString, BASIC_ELEMENT_SIZE/2, SCREEN_HEIGHT - 20);
+		batcher.drawSprite(BASIC_ELEMENT_SIZE, SCREEN_HEIGHT - BASIC_ELEMENT_SIZE, BUTTON_SIZE, BUTTON_SIZE, Assets.pause);
 	}
 	
 	/**
@@ -325,8 +302,6 @@ public class GameScreen extends GLScreen {
 	private void presentPaused() {
 		//dessin du menu de pause
 		batcher.drawSprite(SCREEN_WIDTH/2, SCREEN_HEIGHT/2, 6*BASIC_ELEMENT_SIZE, 3*BASIC_ELEMENT_SIZE, Assets.pauseMenu);
-		//TODO [1280x800] constantes à modifier
-		Assets.font.drawText(batcher, scoreString, BASIC_ELEMENT_SIZE/2, SCREEN_HEIGHT - 20);
 		batcher.drawSprite(BASIC_ELEMENT_SIZE, BASIC_ELEMENT_SIZE, BUTTON_SIZE, BUTTON_SIZE, Settings.soundEnabled ? Assets.soundOn : Assets.soundOff);
 	}
 	
@@ -351,10 +326,6 @@ public class GameScreen extends GLScreen {
 	private void presentGameOver() {
 		//dessin du message "GAME OVER"
 		batcher.drawSprite(SCREEN_WIDTH/2, SCREEN_HEIGHT/2, 5*BASIC_ELEMENT_SIZE, 3*BASIC_ELEMENT_SIZE, Assets.gameOver);
-		//affichage du score final
-		float scoreWidth = Assets.font.glyphWidth * scoreString.length();
-		//TODO [1280x800] constantes à modifier
-		Assets.font.drawText(batcher, scoreString, SCREEN_WIDTH/2 - scoreWidth / 2, SCREEN_HEIGHT-20);
 	}
 	
 	/**
