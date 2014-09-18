@@ -18,6 +18,7 @@ import yoan.game.framework.modules.graphics.gl.Animation;
 import yoan.game.framework.modules.graphics.gl.Font;
 import yoan.game.framework.modules.graphics.gl.Texture;
 import yoan.game.framework.modules.graphics.gl.TextureRegion;
+import yoan.game.framework.util.math.region.RectangleRegion;
 
 /**
  * Conteneur des assets (graphic, audio,...) du jeu
@@ -102,6 +103,10 @@ public class Assets {
                             new TextureRegion(robot, 0, 0, ROBOT_SPRITE_WIDTH, ROBOT_SPRITE_HEIGHT),
                             new TextureRegion(robot, ROBOT_SPRITE_WIDTH, 0, ROBOT_SPRITE_WIDTH, ROBOT_SPRITE_HEIGHT),
                             new TextureRegion(robot, 2*ROBOT_SPRITE_WIDTH, 0, ROBOT_SPRITE_WIDTH, ROBOT_SPRITE_HEIGHT));
+        robotStand.setPhysicalBounds(
+        					new RectangleRegion(0.27f,0.41f,0.83f,1.0f),
+        					new RectangleRegion(0.27f,0.41f,0.83f,1.0f),
+        					new RectangleRegion(0.27f,0.41f,0.83f,1.0f));
         robotHit = new TextureRegion(robot, 3*ROBOT_SPRITE_WIDTH, 0, ROBOT_SPRITE_WIDTH, ROBOT_SPRITE_HEIGHT);
         robotWalk = new Animation(0.2f,
                             new TextureRegion(robot, 0, ROBOT_SPRITE_HEIGHT, ROBOT_SPRITE_WIDTH, ROBOT_SPRITE_HEIGHT),

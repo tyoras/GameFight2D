@@ -56,17 +56,11 @@ public abstract class Champion extends DynamicGameObject {
 		//si déplacement vers le haut 
 		if(velocity.y > 0 && state != State.HIT){
 			//saut
-			if(state != State.JUMP){
-				state= State.JUMP;
-				stateTime= 0;
-			}
+			changeState(State.JUMP);
 		//si déplacement vers le bas
 		} else if(velocity.y < 0 && state != State.HIT){
 			//chute
-			if(state != State.FALL){
-				state= State.FALL;
-				stateTime= 0;
-			}
+			changeState(State.FALL);
 		}
 		//déplacements sur les bords opposés du monde
 		if(position.x < 0) position.x= World.WORLD_WIDTH;
@@ -93,5 +87,31 @@ public abstract class Champion extends DynamicGameObject {
 		velocity.y= JUMP_VELOCITY;
 		state= State.JUMP;
 		stateTime= 0;
+	}
+	
+	/**
+	 * Gestion du touché du sol de l'arène
+	 */
+	public void hitGround(){
+		velocity.y= 0;
+		state= State.STAND;
+		stateTime= 0;
+	}
+	
+	/**
+	 * Gestion du touché de bord de l'arène
+	 */
+	public void hitSide(){
+		//rebond => réinitialistion de la vitesse de saut vers le côté opposé
+		velocity.x= -velocity.x;
+		state= State.JUMP;
+		stateTime= 0;
+	}
+	
+	public void changeState(State newState) {
+		if(state != newState){
+			state= newState;
+			stateTime= 0;
+		}
 	}
 }

@@ -6,6 +6,9 @@ import java.util.Random;
 
 import yoan.game.framework.util.math.OverlapTester;
 import yoan.game.framework.util.math.Vector2;
+import yoan.game.gf2d.world.model.champions.Champion;
+import yoan.game.gf2d.world.model.champions.FakeChampion1;
+import yoan.game.gf2d.world.model.champions.Robot;
 
 /**
  * Modélisation du monde
@@ -51,10 +54,6 @@ public class World {
     public final WorldListener listener;
     /** Générateur d'aléatoire */
     public final Random rand;
-    /** Hauteur max atteinte */
-    public float heightSoFar;
-    /** Score de la partie */
-    public int score;
     /** Etat courant du monde */
     public State state;
     
@@ -63,15 +62,13 @@ public class World {
      * @param listener : consommateur des évenements du monde
      */
     public World(WorldListener listener) {
-    	champ = new FakeChampion1(WORLD_WIDTH/2, 1);
+    	champ = new Robot(WORLD_WIDTH/2, 4);
     	enemy = new FakeChampion1(WORLD_WIDTH/3, 1);
     	platforms = new ArrayList<Platform>();
     	this.listener = listener;
     	rand = new Random();
     	generateLevel();
     	 
-    	heightSoFar = 0;
-    	score = 0;
     	state = State.RUNNING;
     }
 
@@ -115,15 +112,22 @@ public class World {
 	 * @param accelX : accéleration sur l'axe X
 	 */
 	private void updateChampion(float deltaTime, float accelX) {
-		//rebond sur le sol autorisé
-	    if (champ.state != Champion.State.HIT && champ.position.y <= 0.5f)
-	        champ.hitPlatform();
+		//le champion s'arrête de tomber au niveau du sol
+	    //if (champ.state != Champion.State.HIT && champ.position.y <= 2.0f)
+    	if (champ.position.y <= 2.0f) {
+	    	champ.velocity.y = 0;
+    		champ.position.y = 2.0f;
+    	}
 	    //modification de la vitesse horizontale en fonction de l'inclinaison du téléphone
 	    if (champ.state != Champion.State.HIT)
 	    	// /10 pour la normalisation [-10;10] => [-1;1]
 	        champ.velocity.x = accelX / 10 * champ.MOVE_VELOCITY;
+	    //rebond sur les côtés autorisé
+	    if (champ.state != Champion.State.HIT && (champ.getMostLeftPosition() < 0 || champ.getMostRightPosition() > World.WORLD_WIDTH))
+	        champ.hitSide();
+	    if (champ.state != Champion.State.HIT && (champ.getBotPosition() <= 0))
+	        champ.hitGround();
 	    champ.update(deltaTime);
-	    //heightSoFar = Math.max(champ.position.y, heightSoFar);
 	}
 	
 	/**
@@ -217,9 +221,8 @@ public class World {
 	 * Détection de la mort du personnage
 	 */
 	private void checkGameOver(){
-		//si on tombe 7,5m (la moitié de l'écran) plus bas que la plus haute position atteinte
-		if(heightSoFar - 7.5f > champ.position.y){
-			state= State.GAME_OVER;
-		}
+//		if(...){
+//			state= State.GAME_OVER;
+//		}
 	}
 }

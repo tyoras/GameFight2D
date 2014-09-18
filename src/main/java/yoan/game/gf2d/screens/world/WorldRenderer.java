@@ -7,15 +7,19 @@ import yoan.game.framework.modules.graphics.gl.Camera2D;
 import yoan.game.framework.modules.graphics.gl.GLGraphics;
 import yoan.game.framework.modules.graphics.gl.SpriteBatcher;
 import yoan.game.framework.modules.graphics.gl.TextureRegion;
+import yoan.game.framework.modules.graphics.gl.Vertices;
 import yoan.game.gf2d.util.Assets;
 import yoan.game.gf2d.world.model.Platform;
 import yoan.game.gf2d.world.model.World;
+import yoan.game.gf2d.world.model.champions.Champion;
 
 /**
  * Moteur de rendu du monde
  * @author yoan
  */
 public class WorldRenderer {
+	private static final boolean DEBUG = true;
+	
 	/** Largeur de l'écran en unité du monde */
 	static final float FRUSTUM_WIDTH = 15;
 	/** Hauteur de l'écran en unité du monde */
@@ -71,13 +75,20 @@ public class WorldRenderer {
 		GL10 gl = glGraphics.getGL();
 		gl.glEnable(GL10.GL_BLEND);
 		gl.glBlendFunc(GL10.GL_SRC_ALPHA, GL10.GL_ONE_MINUS_SRC_ALPHA);
-		//un seul batch pour tous les éléments
-		batcher.beginBatch(Assets.items);
+		
+		batcher.beginBatch(Assets.robot);
 		renderChampion();
+		batcher.endBatch();
+		batcher.beginBatch(Assets.items);
 		renderEnemy();
 		renderPlatforms();
 		renderItems();
 		batcher.endBatch();
+		
+		if (DEBUG)
+			renderChampionBound(world.champ);
+			renderChampionBound(world.enemy);
+		
 		gl.glDisable(GL10.GL_BLEND);
 	}
 
@@ -86,23 +97,87 @@ public class WorldRenderer {
 	 */
 	private void renderChampion(){
 		TextureRegion keyFrame;
+		Champion champ = world.champ;
 		switch(world.champ.state){
 			case FALL:
 				//recupération de la frame de chute
-				keyFrame= Assets.fakeChamp1Fall.getKeyFrame(world.champ.stateTime, Animation.ANIMATION_LOOPING);
+				keyFrame= Assets.robotStand.getKeyFrame(champ.stateTime, Animation.ANIMATION_LOOPING);
 				break;
 			case JUMP:
 				//récupération de la frame de saut
-				keyFrame= Assets.fakeChamp1Jump.getKeyFrame(world.champ.stateTime, Animation.ANIMATION_LOOPING);
+				keyFrame= Assets.robotStand.getKeyFrame(champ.stateTime, Animation.ANIMATION_LOOPING);
+				break;
+			case STAND:
+				keyFrame= Assets.robotStand.getKeyFrame(champ.stateTime, Animation.ANIMATION_LOOPING);
+				break;
+			case WALK:
+				keyFrame= Assets.robotWalk.getKeyFrame(champ.stateTime, Animation.ANIMATION_LOOPING);
 				break;
 			case HIT:
 			default:
-				keyFrame= Assets.fakeChamp1Hit;
+				keyFrame= Assets.robotHit;
 		}
 		//on détermine de quel côté il est tourné
 		float side= world.champ.velocity.x < 0 ? -1 : 1;
-		batcher.drawSprite(world.champ.position.x, world.champ.position.y, side * 1, 1, keyFrame);
+		batcher.drawSprite(world.champ.position.x, world.champ.position.y, side *2, 4, keyFrame);
 	}
+	
+	/**
+	 * Débug uniquement : affiche les limites physique d'un champion
+	 * @param champ : le champion dont on veut afficher les limites
+	 */
+	private void renderChampionBound(Champion champ){
+		GL10 gl = glGraphics.getGL();
+		gl.glDisable(GL10.GL_TEXTURE_2D);
+		Vertices vertices = new Vertices(glGraphics, 4, 0, true, false);
+		
+		//pré-calcul
+		float halfWidth = champ.bounds.width / 2;
+		float halfHeight = champ.bounds.height / 2;
+		//calcul du coin inférieur gauche
+		float x1 = champ.position.x - halfWidth;
+		float y1 = champ.position.y - halfHeight;
+		//calcul du coin supérieur droit
+		float x2 = champ.position.x + halfWidth;
+		float y2 = champ.position.y + halfHeight;
+		
+		int bufferIndex = 0;
+		float[] verticesBuffer = new float[4*6];
+		//coin inférieur gauche
+		verticesBuffer[bufferIndex++] = x1;
+		verticesBuffer[bufferIndex++] = y1;
+		verticesBuffer[bufferIndex++] = 1.0f;
+		verticesBuffer[bufferIndex++] = 0.0f;
+		verticesBuffer[bufferIndex++] = 0.0f;
+		verticesBuffer[bufferIndex++] = 1.0f;
+		//coin inférieur droit
+		verticesBuffer[bufferIndex++] = x2;
+		verticesBuffer[bufferIndex++] = y1;
+		verticesBuffer[bufferIndex++] = 1.0f;
+		verticesBuffer[bufferIndex++] = 0.0f;
+		verticesBuffer[bufferIndex++] = 0.0f;
+		verticesBuffer[bufferIndex++] = 1.0f;
+		//coin supérieur droit
+		verticesBuffer[bufferIndex++] = x2;
+		verticesBuffer[bufferIndex++] = y2;
+		verticesBuffer[bufferIndex++] = 1.0f;
+		verticesBuffer[bufferIndex++] = 0.0f;
+		verticesBuffer[bufferIndex++] = 0.0f;
+		verticesBuffer[bufferIndex++] = 1.0f;
+		//coin supérieur gauche
+		verticesBuffer[bufferIndex++] = x1;
+		verticesBuffer[bufferIndex++] = y2;
+		verticesBuffer[bufferIndex++] = 1.0f;
+		verticesBuffer[bufferIndex++] = 0.0f;
+		verticesBuffer[bufferIndex++] = 0.0f;
+		verticesBuffer[bufferIndex++] = 1.0f;
+		vertices.setVertices(verticesBuffer, 0, bufferIndex);
+		vertices.bind();
+		vertices.draw(GL10.GL_LINE_LOOP, 0, 4);
+		vertices.unbind();
+		gl.glEnable(GL10.GL_TEXTURE_2D);
+	}
+	
 	
 	/**
 	 * Effectue le rendu de l'adversaire en fonction de son état
